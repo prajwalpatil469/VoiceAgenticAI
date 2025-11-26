@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Test</title>
+</head>
+<body>
+    <h1>Text to Speech & Speech to Text Test</h1>
+    
+    <!-- Audio Player for TTS -->
+    <h2>Text to Speech</h2>
+    <audio id="audio" controls>
+        <source id="audioSource" src="" type="audio/wav">
+        Your browser does not support the audio element.
+    </audio>
+    <button onclick="getAudio()">Generate Speech</button>
+    
+    <!-- Microphone Section for Speech to Text -->
+    <h2>Speech to Text</h2>
+    <button onclick="startRecording()">Start Recording</button>
+    <button onclick="stopRecording()">Stop Recording</button>
+    <p id="transcription">Transcribed Text will appear here...</p>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        
+        // Handle Text to Speech generation
+        async function getAudio() {
+            const text = "Hi Gemini, this is a test!";  // You can replace this text with any other text you'd like to test.
+            const response = await fetch('http://10.134.66.2:8000/api/tts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: text })
+            });
+
+            const blob = await response.blob();
+            const audioURL = URL.createObjectURL(blob);
+            document.getElementById('audioSource').src = audioURL;
+            document.getElementById('audio').load();
+        }
+
+        // Speech-to-Text - Start recording audio
+        function startRecording() {
+            audioChunks = [];  // Clear previous audio chunks
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+                    mediaRecorder.onstop = async () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioFile = await audioBlob.arrayBuffer();
+                        
+                        // Send the recorded audio to STT API for transcription
+                        const response = await fetch('http://10.134.66.2:8000/api/stt', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ audio_file: audioFile })
+                        });
+                        
+                        const data = await response.json();
+                        document.getElementById('transcription').textContent = `Transcribed Text: ${data.transcribed_text}`;
+                    };
+                    mediaRecorder.start();
+                })
+                .catch(error => {
+                    console.error("Error accessing the microphone: ", error);
+                });
+        }
+
+        // Stop recording and process the audio
+        function stopRecording() {
+            if (mediaRecorder) {
+                mediaRecorder.stop();
+            }
+        }
+    </script>
+</body>
+</html>

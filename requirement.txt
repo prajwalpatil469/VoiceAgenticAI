@@ -1,0 +1,52 @@
+# -----------------------------------
+# Python Version Requirement
+# -----------------------------------
+python_version >= "3.10"
+
+# -----------------------------------
+# Core Frameworks
+# -----------------------------------
+fastapi==0.115.0
+uvicorn[standard]==0.30.1
+
+# -----------------------------------
+# LangChain + LangGraph (Corrected Versions)
+# -----------------------------------
+langchain==0.2.12
+langchain-core==0.2.39
+langgraph==0.2.32
+langchain-community==0.2.7
+
+# -----------------------------------
+# Google GenAI / Vertex AI Live API
+# -----------------------------------
+google-auth==2.29.0
+google-cloud-core==2.4.1
+google-cloud-aiplatform==1.63.0
+google-genai==0.3.1
+
+
+# -----------------------------------
+# Audio Processing
+# -----------------------------------
+numpy==1.26.4
+sounddevice==0.4.6
+pydub==0.25.1
+
+# -----------------------------------
+# Data Models / Schemas
+# -----------------------------------
+pydantic==2.7.0
+pydantic-settings==2.2.1
+
+# -----------------------------------
+# Utilities
+# -----------------------------------
+python-dotenv==1.0.1
+requests==2.32.2
+
+# -----------------------------------
+# Optional Debugging Tools
+# -----------------------------------
+rich==13.7.1
+loguru==0.7.2
